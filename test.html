@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dermatology Resources — Test Page</title>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fff; color: #222; }
+    header { background: #1a3a52; color: #fff; padding: 18px 40px; display: flex; align-items: center; gap: 16px; }
+    header span { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+    header small { font-size: 13px; opacity: 0.65; }
+    nav { background: #f5f5f5; border-bottom: 1px solid #ddd; padding: 0 40px; display: flex; gap: 0; }
+    nav a { display: block; padding: 12px 18px; font-size: 14px; color: #444; text-decoration: none; border-bottom: 3px solid transparent; }
+    nav a.active { color: #1a6faf; border-bottom-color: #1a6faf; font-weight: 600; }
+    .page { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+    h1 { font-size: 26px; color: #1a3a52; margin-bottom: 8px; }
+    .byline { font-size: 13px; color: #888; margin-bottom: 24px; }
+    .intro { font-size: 16px; line-height: 1.7; color: #333; margin-bottom: 8px; background: #f8f8f8; border-left: 4px solid #1a6faf; padding: 18px 22px; border-radius: 4px; }
+    .section-title { font-size: 19px; font-weight: 700; color: #1a3a52; margin: 36px 0 12px; }
+    .body-text { font-size: 15px; line-height: 1.75; color: #444; margin-bottom: 16px; }
+    .tag { display: inline-block; background: #e8f1fb; color: #1a6faf; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-right: 6px; margin-bottom: 6px; }
+    footer { background: #f5f5f5; border-top: 1px solid #ddd; padding: 24px 40px; font-size: 13px; color: #888; text-align: center; }
+
+    /* ── Test harness banner ── */
+    #test-banner {
+      background: #fff3cd; border-bottom: 2px solid #ffc107;
+      padding: 10px 24px; font-size: 13px; color: #7a5000;
+      display: flex; align-items: center; gap: 10px;
+    }
+    #test-banner strong { color: #b45300; }
+  </style>
+</head>
+<body>
+
+<div id="test-banner">
+  <strong>TEST MODE</strong> — This page simulates the live site. The FAQ carousel is injected after <code>#page-intro</code>, just as Convert will do.
+</div>
+
+<header>
+  <div>
+    <span>MedPractice Network</span><br>
+    <small>Clinical Education &amp; Resources</small>
+  </div>
+</header>
+
+<nav>
+  <a href="#">Home</a>
+  <a href="#" class="active">Dermatology</a>
+  <a href="#">Psychiatry</a>
+  <a href="#">CME Credits</a>
+  <a href="#">Tools</a>
+</nav>
+
+<div class="page">
+  <div class="byline">Dermatology › Behavioral Conditions › BFRBs</div>
+  <h1>Understanding Body-Focused Repetitive Behaviors (BFRBs)</h1>
+  <div class="byline">Reviewed by the MedPractice Clinical Board · Updated March 2025 · 8 min read</div>
+
+  <div id="page-intro" class="intro">
+    Body-Focused Repetitive Behaviors (BFRBs) — including excoriation (skin-picking) disorder and trichotillomania (hair-pulling disorder) — are among the most underdiagnosed conditions seen in both dermatology and primary care settings. Recognizing and appropriately managing these disorders can significantly reduce patient distress and prevent long-term physical complications.
+  </div>
+
+  <!-- ↑ The FAQ carousel will be injected immediately after #page-intro ↑ -->
+
+  <div class="section-title">Overview</div>
+  <p class="body-text">BFRBs are classified in the DSM-5 under Obsessive-Compulsive and Related Disorders. Despite affecting an estimated 1–5% of the population, they are frequently misidentified as habits, self-harm, or symptoms of other conditions. Patients often present to dermatologists or primary care physicians before receiving a psychiatric or behavioral referral.</p>
+  <p class="body-text">Early identification by frontline clinicians is critical. A brief screening question — "Do you find yourself repeatedly picking at your skin or pulling your hair in a way that's hard to stop?" — can open the door to diagnosis and appropriate referral.</p>
+
+  <div class="section-title">Clinical Presentation</div>
+  <p class="body-text">Excoriation disorder presents with recurrent skin lesions, often on the face, arms, or scalp. Patients may report a sense of tension before picking and relief or pleasure during the behavior. Trichotillomania presents with noticeable hair loss in irregular patterns; unlike alopecia areata, the hair loss is typically patchy and asymmetric, with broken hairs of varying lengths.</p>
+
+  <div style="margin-top: 20px;">
+    <span class="tag">Excoriation Disorder</span>
+    <span class="tag">Trichotillomania</span>
+    <span class="tag">BFRBs</span>
+    <span class="tag">OCD Spectrum</span>
+    <span class="tag">Habit Reversal Training</span>
+  </div>
+
+  <div class="section-title">References</div>
+  <p class="body-text" style="font-size:13px; color:#888;">
+    American Psychiatric Association. (2013). Diagnostic and Statistical Manual of Mental Disorders (5th ed.).<br>
+    Grant JE, et al. (2012). Trichotillomania. N Engl J Med, 366(18), 1974–1978.<br>
+    Snorrason I, et al. (2012). Skin picking disorder. J Anxiety Disord, 26(5), 580–587.
+  </p>
+</div>
+
+<footer>
+  &copy; 2025 MedPractice Network · For healthcare professionals only · Not for patient distribution
+</footer>
+
+<script src="faq-carousel.js"></script>
+<script>
+  // Simulate Convert's placeholder replacement for local testing
+  var mod = document.getElementById('faq-carousel-module');
+  if (mod) {
+    // Already appended to body by the fallback — move it to after #page-intro
+    var anchor = document.getElementById('page-intro');
+    if (anchor) anchor.insertAdjacentElement('afterend', mod);
+  }
+</script>
+
+</body>
+</html>
