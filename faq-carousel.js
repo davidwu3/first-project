@@ -42,10 +42,12 @@
     '#faq-carousel-module{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f0f6fb;border:1px solid #cde0f0;border-radius:10px;padding:32px 40px 24px;max-width:760px;margin:32px auto;position:relative;}',
     '#faq-carousel-module .fcm-label{font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#5b8db8;margin-bottom:12px;}',
     '#faq-carousel-module .fcm-track{overflow:hidden;}',
-    '#faq-carousel-module .fcm-slide{display:none;}',
-    '#faq-carousel-module .fcm-slide.fcm-active{display:block;}',
-    '#faq-carousel-module .fcm-question{font-size:17px;font-weight:700;color:#1a3a52;margin-bottom:12px;line-height:1.4;}',
-    '#faq-carousel-module .fcm-answer{font-size:15px;color:#3d5a72;line-height:1.65;min-height:90px;}',
+    '#faq-carousel-module .fcm-strip{display:flex;width:100%;}',
+    '#faq-carousel-module .fcm-panel{flex:0 0 50%;min-width:0;}',
+    '#faq-carousel-module .fcm-panel-left{padding-right:20px;}',
+    '#faq-carousel-module .fcm-panel-right{padding-left:20px;border-left:1px solid #cde0f0;}',
+    '#faq-carousel-module .fcm-question{font-size:17px;font-weight:700;color:#1a3a52;margin-bottom:10px;line-height:1.4;}',
+    '#faq-carousel-module .fcm-answer{font-size:15px;color:#3d5a72;line-height:1.65;}',
     '#faq-carousel-module .fcm-nav{display:flex;align-items:center;justify-content:space-between;margin-top:24px;}',
     '#faq-carousel-module .fcm-btn{background:#1a6faf;color:#fff;border:none;border-radius:6px;padding:8px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s;}',
     '#faq-carousel-module .fcm-btn:hover{background:#155a8e;}',
@@ -71,22 +73,30 @@
   var track = document.createElement('div');
   track.className = 'fcm-track';
 
-  faqs.forEach(function (faq, i) {
-    var slide = document.createElement('div');
-    slide.className = 'fcm-slide' + (i === 0 ? ' fcm-active' : '');
+  var strip = document.createElement('div');
+  strip.className = 'fcm-strip';
 
+  function buildPanel(faq) {
+    var panel = document.createElement('div');
+    panel.className = 'fcm-panel';
     var q = document.createElement('p');
     q.className = 'fcm-question';
     q.textContent = faq.q;
-
     var a = document.createElement('p');
     a.className = 'fcm-answer';
     a.textContent = faq.a;
+    panel.appendChild(q);
+    panel.appendChild(a);
+    return panel;
+  }
 
-    slide.appendChild(q);
-    slide.appendChild(a);
-    track.appendChild(slide);
-  });
+  var lp = buildPanel(faqs[0]);
+  lp.className = 'fcm-panel fcm-panel-left';
+  var rp = buildPanel(faqs[1]);
+  rp.className = 'fcm-panel fcm-panel-right';
+  strip.appendChild(lp);
+  strip.appendChild(rp);
+  track.appendChild(strip);
   wrapper.appendChild(track);
 
   var nav = document.createElement('div');
@@ -102,7 +112,7 @@
 
   var dots = faqs.map(function (_, i) {
     var dot = document.createElement('button');
-    dot.className = 'fcm-dot' + (i === 0 ? ' fcm-dot-active' : '');
+    dot.className = 'fcm-dot' + (i < 2 ? ' fcm-dot-active' : '');
     dot.setAttribute('aria-label', 'Go to question ' + (i + 1));
     dotsEl.appendChild(dot);
     return dot;
@@ -110,7 +120,7 @@
 
   var counter = document.createElement('span');
   counter.className = 'fcm-counter';
-  counter.textContent = '1 / ' + faqs.length;
+  counter.textContent = '1–2 / ' + faqs.length;
 
   var nextBtn = document.createElement('button');
   nextBtn.className = 'fcm-btn';
@@ -123,24 +133,80 @@
   wrapper.appendChild(nav);
 
   var current = 0;
-  var slides = track.querySelectorAll('.fcm-slide');
+  var busy = false;
 
-  function goTo(index) {
-    slides[current].classList.remove('fcm-active');
-    dots[current].classList.remove('fcm-dot-active');
-    current = index;
-    slides[current].classList.add('fcm-active');
-    dots[current].classList.add('fcm-dot-active');
-    counter.textContent = (current + 1) + ' / ' + faqs.length;
+  function updateNav() {
     prevBtn.disabled = current === 0;
-    nextBtn.disabled = current === faqs.length - 1;
+    nextBtn.disabled = current >= faqs.length - 2;
+    counter.textContent = (current + 1) + '–' + (current + 2) + ' / ' + faqs.length;
+    dots.forEach(function (dot, i) {
+      dot.classList.toggle('fcm-dot-active', i === current || i === current + 1);
+    });
+  }
+
+  function slideNext() {
+    if (busy || current >= faqs.length - 2) return;
+    busy = true;
+    var panelWidth = track.offsetWidth / 2;
+    var newPanel = buildPanel(faqs[current + 2]);
+    newPanel.className = 'fcm-panel fcm-panel-right';
+    strip.appendChild(newPanel);
+    strip.style.transition = 'transform 0.25s ease';
+    strip.style.transform = 'translateX(-' + panelWidth + 'px)';
+    strip.addEventListener('transitionend', function handler() {
+      strip.removeEventListener('transitionend', handler);
+      strip.style.transition = 'none';
+      strip.removeChild(strip.firstChild);
+      strip.style.transform = 'translateX(0)';
+      strip.children[0].className = 'fcm-panel fcm-panel-left';
+      strip.children[1].className = 'fcm-panel fcm-panel-right';
+      current++;
+      updateNav();
+      busy = false;
+    });
     trackClick();
   }
 
-  prevBtn.addEventListener('click', function () { if (current > 0) goTo(current - 1); });
-  nextBtn.addEventListener('click', function () { if (current < faqs.length - 1) goTo(current + 1); });
+  function slidePrev() {
+    if (busy || current <= 0) return;
+    busy = true;
+    var panelWidth = track.offsetWidth / 2;
+    var newPanel = buildPanel(faqs[current - 1]);
+    newPanel.className = 'fcm-panel fcm-panel-left';
+    strip.insertBefore(newPanel, strip.firstChild);
+    strip.style.transition = 'none';
+    strip.style.transform = 'translateX(-' + panelWidth + 'px)';
+    void strip.offsetWidth;
+    strip.style.transition = 'transform 0.25s ease';
+    strip.style.transform = 'translateX(0)';
+    strip.addEventListener('transitionend', function handler() {
+      strip.removeEventListener('transitionend', handler);
+      strip.style.transition = 'none';
+      strip.removeChild(strip.lastChild);
+      strip.children[0].className = 'fcm-panel fcm-panel-left';
+      strip.children[1].className = 'fcm-panel fcm-panel-right';
+      current--;
+      updateNav();
+      busy = false;
+    });
+    trackClick();
+  }
+
+  nextBtn.addEventListener('click', slideNext);
+  prevBtn.addEventListener('click', slidePrev);
+
   dots.forEach(function (dot, i) {
-    dot.addEventListener('click', function () { if (i !== current) goTo(i); });
+    dot.addEventListener('click', function () {
+      if (busy) return;
+      var target = Math.min(i, faqs.length - 2);
+      if (target === current) return;
+      current = target;
+      strip.children[0].querySelector('.fcm-question').textContent = faqs[current].q;
+      strip.children[0].querySelector('.fcm-answer').textContent = faqs[current].a;
+      strip.children[1].querySelector('.fcm-question').textContent = faqs[current + 1].q;
+      strip.children[1].querySelector('.fcm-answer').textContent = faqs[current + 1].a;
+      updateNav();
+    });
   });
 
   function trackClick() {
